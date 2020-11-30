@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>object generator Online</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script>
+    window.onload = function() {
+        var sizeTmp = document.getElementsByClassName("existingObject").length;
+        if(sizeTmp === 0){
+            document.getElementsByClassName("createObjectTable")[0].style.display = 'none';
+        }else{
+            var selItem = sessionStorage.getItem("objId");
+            var a = parseInt(selItem);
+            document.getElementById("objectType").selectedIndex = a;
+        }
+    }
+    function loadObject(){
+        indeks = document.getElementById("objectType").selectedIndex;
+        var e = document.getElementById("objectType");
+        var tmp = e.options[e.selectedIndex].text;
+        var n = indeks.toString();
+        sessionStorage.setItem("objId", n);
+        document.location.href = "/object?objectType=" + tmp;
+    }
+    function addField(){
+        var tableRef = document.getElementById("createClassTable").getElementsByTagName("tbody")[0];
+        //var fieldRows = document.getElementsByClassName("fieldRow");
+        //var counter = fieldRows.length;
+
+        var newNode = tableRef.rows[0].cloneNode(true);
+
+        var InputType = newNode.getElementsByTagName("input");
+
+        for (var i=0; i<InputType.length; i++){
+            if( InputType[i].type=='checkbox'){
+                InputType[i].checked = false;
+            }else{
+                InputType[i].value='';
+            }
+        }
+
+        //clone.id = "newID"; // change id or other attributes/contents
+        tableRef.appendChild(newNode); // add new row to end of table
+        }
+
+    function showItems() {
+             document.location.href = "/viewer";
+        }
+    function itemCreator() {
+             document.location.href = "/object";
+        }
+    function describerNew() {
+             document.location.href = "/describe";
+        }
+    </script>
+</head>
+
+<body >
+<div class="container">
+    <form action="/describe" >
+        <h2>Objects</h2>
+        <input type="button" class="btn btn-info" value="Show database"
+               th:onclick="showItems()">
+        <input type="button" class="btn btn-info" value="Item Creator"
+               th:onclick="itemCreator()">
+        <input type="button" class="btn btn-info" value="new Class"
+               th:onclick="describerNew()">
+
+        <p>Set name and fields for the type of object being created</p>
+
+        <div>
+            <div>
+                <p>Class Name:</p>
+                <input type="text" class="form-control" id="className" name="className" th:value="${classInput}">
+            </div>
+            <span th:text="${message}"></span>
+            <br>
+            <span th:text="${message2}"></span>
+            <table class="table" id="createClassTable">
+                <thead>
+                    <tr>
+                        <th>field name</th>
+                        <th>label</th>
+                        <th>data type</th>
+                    </tr>
+                </thead>
+                <tbody id="viewObject">
+                    <tr  th:each="fld : ${fldList}" class="fieldRow">
+                        <td>
+                            <input type="text" class="form-control" name="field" th:value="${fld.name}">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="label" th:value="${fld.label}">
+                        </td>
+                        <td>
+                            <select class="form-control" name="dataType">
+                                <div th:each="type : ${typeList}">
+                                    <option th:text="${type.name}"></option>
+                                </div>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr  class="fieldRow">
+                        <td>
+                            <input type="text" class="form-control" name="field" >
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="label" >
+                        </td>
+                        <td>
+                            <select class="form-control" name="dataType">
+                                <div th:each="type : ${typeList}">
+                                    <option th:text="${type.name}"></option>
+                                </div>
+                            </select>
+                        </td>
+                    </tr>
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <input type="button" class="btn btn-info" value="add field"
+                                   th:onclick="addField()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="submit" class="btn btn-primary" value="Create"/>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </form>
+</div>
+</body>
+</html>

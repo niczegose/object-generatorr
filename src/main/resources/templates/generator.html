@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>object generator Online</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script>
+    window.onload = function() {
+        var sizeTmp = document.getElementsByClassName("existingObject").length;
+        if(sizeTmp === 0){
+            document.getElementsByClassName("createObjectTable")[0].style.display = 'none';
+        }else{
+            var selItem = sessionStorage.getItem("objId");
+            var a = parseInt(selItem);
+            document.getElementById("objectType").selectedIndex = a;
+        }
+    }
+    function loadObject(){
+        indeks = document.getElementById("objectType").selectedIndex;
+        var e = document.getElementById("objectType");
+        var tmp = e.options[e.selectedIndex].text;
+        var n = indeks.toString();
+        sessionStorage.setItem("objId", n);
+        document.location.href = "/object?objectType=" + tmp;
+    }
+
+    function showItems() {
+             document.location.href = "/viewer";
+        }
+    function itemCreator() {
+             document.location.href = "/object";
+        }
+    function describerNew() {
+             document.location.href = "/describe";
+        }
+    </script>
+</head>
+
+<body >
+<div class="container">
+    <form action="/object" >
+        <h2>Objects</h2>
+        <input type="button" class="btn btn-info" value="Show database"
+               th:onclick="showItems()">
+        <input type="button" class="btn btn-info" value="Item Creator"
+               th:onclick="itemCreator()">
+        <input type="button" class="btn btn-info" value="new Class"
+               th:onclick="describerNew()">
+        <p>Select object type you want to create</p>
+
+        <div class="form-group">
+            <label for="objectType">Choose object:</label>
+            <select class="form-control" id="objectType" name="objectType"  onchange="loadObject()">
+                <div th:each="object : ${objectList}">
+                    <option th:text="${object.name}"></option>
+                </div>
+            </select>
+            <script>
+                    document.getElementById("objectType").selectedIndex = -1
+            </script>
+        </div>
+
+
+        <div>
+            <h2>
+                <span th:text="${message}"></span>
+            </h2>
+            <table class="createObjectTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="viewObject">
+                    <tr th:each="field : ${fieldList}" class="existingObject">
+                        <td th:text="${field.label}"></td>
+                        <td>
+                            <div class="form-group">
+                                <input type="text" class="form-control" th:id="${field.name}" th:name="${field.name}" >
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="fieldChoice : ${fieldListChoice}" class="existingObject">
+                        <td th:text="${fieldChoice.label}"></td>
+                        <td>
+                            <div th:each="option : ${fieldChoice.choiceList}" class="btn-group">
+                                <input type="radio" th:id="${option}" th:name="${fieldChoice.name}" th:value="${option}">
+                                <label th:for="${option}" th:text="${option}"></label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="submit" class="btn btn-primary" value="Create"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+</body>
+</html>

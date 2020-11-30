@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>object generator Online</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script>
+    window.onload = function() {
+        var sizeTmp = document.getElementsByClassName("existingObject").length;
+        if(sizeTmp === 0){
+            document.getElementsByClassName("createObjectTable")[0].style.display = 'none';
+        }else{
+            var selItem = sessionStorage.getItem("objId");
+            var a = parseInt(selItem);
+            document.getElementById("objectType").selectedIndex = a;
+        }
+    }
+    function loadObject(){
+        indeks = document.getElementById("objectType").selectedIndex;
+        var e = document.getElementById("objectType");
+        var tmp = e.options[e.selectedIndex].text;
+        var n = indeks.toString();
+        sessionStorage.setItem("objId", n);
+        document.location.href = "/viewer?objectType=" + tmp;
+    }
+    function showItems() {
+             document.location.href = "/viewer";
+        }
+    function itemCreator() {
+             document.location.href = "/object";
+        }
+    function describerNew() {
+             document.location.href = "/describe";
+        }
+    function exportCsv(){
+        indeks = document.getElementById("objectType").selectedIndex;
+        var e = document.getElementById("objectType");
+        var className = e.options[e.selectedIndex].text;
+        document.location.href = "/download?export=" + className;
+    }
+    </script>
+</head>
+
+<body >
+<div class="container">
+    <form action="/download" >
+        <h2>Objects</h2>
+        <input type="button" class="btn btn-info" value="Show database"
+               th:onclick="showItems()">
+        <input type="button" class="btn btn-info" value="Item Creator"
+               th:onclick="itemCreator()">
+        <input type="button" class="btn btn-info" value="new Class"
+               th:onclick="describerNew()">
+        <p>Select objects type to show list</p>
+
+        <div class="form-group">
+            <label for="objectType">Choose object:</label>
+            <select class="form-control" id="objectType" name="objectType"  onchange="loadObject()">
+                <div th:each="object : ${objectList}">
+                    <option th:text="${object.name}"></option>
+                </div>
+            </select>
+            <script>
+                    document.getElementById("objectType").selectedIndex = -1
+            </script>
+        </div>
+
+
+        <div>
+            <h2>
+                <span th:text="${message}"></span>
+            </h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <input type="submit" class="btn btn-info" value="export to CSV">
+                        <!-- Trigger the modal with a button -->
+                        <button type="button" class="btn" data-toggle="modal" data-target="#myModal">+</button>
+
+                        <!-- Modal -->
+                        <div id="myModal" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Set filters for export</h4>
+                                        <h5>you can provide several values separated by a comma</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div th:each="filter : ${filterList}" class="existingObject">
+                                            <span th:text="${filter.label}"></span>
+                                            <div th:each="option : ${filter.radioOptions}" class="btn-group">
+                                                <input type="radio" th:id="${option}" th:name="${filter.radioName}" th:value="${option}">
+                                                <label th:for="${option}" th:text="${option}"></label>
+
+                                            </div>
+                                            <input type="text" class="form-control" th:id="${filter.name}" th:name="${filter.name}" >
+                                            <br>
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Filter</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </tr>
+                    <tr>
+                        <th>No.</th>
+                        <div th:each="field : ${fieldList}" class="existingObject">
+                            <th th:text="${field.name}"></th>
+                        </div>
+                    </tr>
+                </thead>
+                <tbody id="viewObject">
+                    <tr th:each="item : ${itemList}" class="existingObject">
+                        <td th:text="${item.id}"></td>
+                        <div th:each="fieldVal : ${item.classFields}" class="existingObject">
+                            <td th:text="${fieldVal.value}"></td>
+                        </div>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+</body>
+</html>
